@@ -1,0 +1,601 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinGuide | 投资助手</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#f5f6fa;color:#2d3436;overflow-x:hidden}
+.container{max-width:1000px;margin:0 auto;padding:0 16px}
+
+/* Top Nav */
+.top-bar{background:linear-gradient(135deg,#0984e3,#6c5ce7);color:#fff;padding:12px 0;position:sticky;top:0;z-index:100}
+.top-bar .container{display:flex;justify-content:space-between;align-items:center}
+.top-bar .logo{font-weight:700;font-size:1.1rem;display:flex;align-items:center;gap:6px}
+.top-bar .logo span{background:rgba(255,255,255,0.2);border-radius:4px;padding:2px 8px;font-size:0.7rem}
+.top-bar .date{font-size:0.75rem;opacity:0.8}
+
+/* Market Overview */
+.market-bar{background:#fff;border-bottom:1px solid #eee;padding:12px 0;margin-bottom:16px}
+.market-bar .container{display:flex;gap:20px;overflow-x:auto}
+.market-item{min-width:140px;padding:4px 0}
+.market-item .name{font-size:0.75rem;color:#636e72;margin-bottom:2px}
+.market-item .val{font-size:1.05rem;font-weight:700}
+.market-item .chg{font-size:0.8rem;font-weight:600;margin-top:1px}
+.up{color:#00b894}.down{color:#d63031}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #eee;display:flex;z-index:100;padding:4px 0;padding-bottom:env(safe-area-inset-bottom)}
+.nav-item{flex:1;text-align:center;padding:6px 0;cursor:pointer;transition:all .2s;border:none;background:transparent}
+.nav-item .icon{font-size:1.2rem;display:block;margin-bottom:2px}
+.nav-item .label{font-size:0.7rem;color:#636e72}
+.nav-item.active .label{color:#0984e3;font-weight:600}
+.nav-item.active .icon{transform:scale(1.1)}
+
+/* Content */
+.content{padding:12px 0 80px}
+.tab-page{display:none}
+.tab-page.active{display:block}
+
+/* Cards */
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04)}
+.card-title{font-size:0.9rem;font-weight:700;color:#2d3436;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title .tip{font-size:0.7rem;font-weight:400;color:#b2bec3;margin-left:auto}
+
+/* Guidance Banner */
+.guide-banner{background:linear-gradient(135deg,#dfe6e9,#b2bec3);border-radius:12px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.guide-banner .g-icon{font-size:1.5rem}
+.guide-banner .g-text{font-size:0.85rem;color:#2d3436;line-height:1.5}
+.guide-banner .g-text strong{color:#0984e3}
+
+/* Stats Grid */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-box{background:#fff;border-radius:10px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.03)}
+.stat-box .s-label{font-size:0.7rem;color:#b2bec3;margin-bottom:4px}
+.stat-box .s-val{font-size:1.1rem;font-weight:700}
+
+/* Holding */
+.hold-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f5f6fa}
+.hold-item:last-child{border-bottom:none}
+.hold-left .h-name{font-weight:600;font-size:0.95rem}
+.hold-left .h-detail{font-size:0.75rem;color:#b2bec3;margin-top:2px}
+.hold-right{text-align:right}
+.hold-right .h-val{font-weight:700;font-size:0.95rem}
+.hold-right .h-pnl{font-size:0.8rem;font-weight:600;margin-top:2px}
+
+/* Stock rows */
+.stock-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f6fa;cursor:pointer}
+.stock-row:last-child{border-bottom:none}
+.stock-row .s-code{font-size:0.7rem;color:#b2bec3}
+.stock-row .s-name{font-weight:600;font-size:0.9rem}
+.stock-row .s-price{font-weight:700;font-size:0.95rem;text-align:right}
+.stock-row .s-chg{font-size:0.8rem;font-weight:600;text-align:right;margin-top:2px}
+.sector-tag{display:inline-block;font-size:0.65rem;padding:2px 8px;border-radius:4px;margin-right:4px;background:#dfe6e9;color:#636e72}
+
+/* Tips */
+.tip-card{background:#fff3e0;border-radius:10px;padding:14px;margin-bottom:10px;border-left:3px solid #fdcb6e}
+.tip-card .t-title{font-weight:700;font-size:0.85rem;color:#e17055;margin-bottom:4px}
+.tip-card .t-text{font-size:0.8rem;color:#636e72;line-height:1.6}
+
+/* Trade */
+.trade-inputs{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.trade-inputs input,.trade-inputs select{flex:1;min-width:80px;padding:10px 12px;border:1.5px solid #dfe6e9;border-radius:8px;font-size:0.85rem;background:#fff}
+.trade-inputs input:focus{outline:none;border-color:#0984e3}
+.btn-buy{background:#00b894;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-weight:600;cursor:pointer;font-size:0.85rem}
+.btn-sell{background:#d63031;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-weight:600;cursor:pointer;font-size:0.85rem}
+.btn-primary{background:#0984e3;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-weight:600;cursor:pointer;font-size:0.85rem;margin-top:8px}
+
+/* Tool styles */
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:0.8rem;color:#636e72;margin-bottom:4px;margin-top:8px}
+input.tool-input{width:100%;padding:8px 12px;border:1.5px solid #dfe6e9;border-radius:8px;font-size:0.85rem;background:#fff}
+.result-val{font-size:1.5rem;font-weight:700;color:#0984e3;margin:8px 0}
+.result-label{font-size:0.75rem;color:#b2bec3}
+
+/* Chart placeholders */
+.chart-box{width:100%;height:200px}
+
+/* Profile */
+.profile-card{text-align:center;padding:24px}
+.profile-card .avatar{font-size:3rem;margin-bottom:8px}
+.profile-card h3{font-size:1.1rem}
+.profile-card p{font-size:0.85rem;color:#636e72;margin-top:4px}
+.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.profile-stat{background:#f8f9fa;border-radius:10px;padding:16px;text-align:center}
+.profile-stat .ps-val{font-weight:700;font-size:1.1rem}
+.profile-stat .ps-label{font-size:0.7rem;color:#b2bec3;margin-top:2px}
+
+@media(max-width:600px){
+.stat-grid{grid-template-columns:repeat(2,1fr)}
+.tool-grid{grid-template-columns:1fr}
+.market-item{min-width:110px}
+}
+</style>
+</head>
+<body>
+
+<!-- Top -->
+<div class="top-bar">
+<div class="container">
+<div class="logo">📊 FinGuide <span>新手友好</span></div>
+<div class="date">模拟交易 · 第 <span id="tradeDay">1</span> 日</div>
+</div>
+</div>
+
+<!-- Market Ticker -->
+<div class="market-bar">
+<div class="container" id="marketTicker"></div>
+</div>
+
+<!-- Content -->
+<div class="container content">
+
+<!-- ====== TAB 1: HOME ====== -->
+<div class="tab-page active" id="page-home">
+<div class="guide-banner">
+<div class="g-icon">🧭</div>
+<div class="g-text"><strong>欢迎来到投资助手！</strong><br>这里是一个零风险模拟投资平台。你可以用虚拟资金练习选股、买卖，学习投资知识。所有数据均为模拟，放心操作 👇</div>
+</div>
+
+<div class="stat-grid" id="homeStats">
+<div class="stat-box"><div class="s-label">总资产</div><div class="s-val" id="hTotal">¥100,000</div></div>
+<div class="stat-box"><div class="s-label">可用资金</div><div class="s-val" id="hCash">¥100,000</div></div>
+<div class="stat-box"><div class="s-label">持仓盈亏</div><div class="s-val" id="hPnl">¥0</div></div>
+<div class="stat-box"><div class="s-label">收益率</div><div class="s-val" id="hReturn">0%</div></div>
+</div>
+
+<div class="tip-card">
+<div class="t-title">💡 新手建议</div>
+<div class="t-text">刚开始建议从熟悉的大公司股票入手，比如茅台、招商银行等。不要一次性投入全部资金，分散投资可以降低风险。先观察几天行情再下手！</div>
+</div>
+
+<div class="card">
+<div class="card-title">🔥 热门板块 <span class="tip">点击查看</span></div>
+<div id="sectorList"></div>
+</div>
+
+<div class="card">
+<div class="card-title">📰 投资小贴士</div>
+<div id="tipsList"></div>
+</div>
+</div>
+
+<!-- ====== TAB 2: MARKET ====== -->
+<div class="tab-page" id="page-market">
+<div class="card">
+<div class="card-title">📋 自选行情 <span class="tip">点击选择，下方交易</span></div>
+<div id="stockList"></div>
+</div>
+<div class="card">
+<div class="card-title">💰 模拟交易</div>
+<div style="font-size:0.85rem;color:#636e72;margin-bottom:8px">已选: <strong id="selStock" style="color:#0984e3">点击上方股票</strong></div>
+<div class="trade-inputs">
+<select id="tradeAction"><option value="buy">买入</option><option value="sell">卖出</option></select>
+<input type="number" id="tradeQty" placeholder="数量(股)" value="100" min="1">
+<input type="number" id="tradePrice" placeholder="价格" step="0.01">
+</div>
+<div style="display:flex;gap:10px">
+<button class="btn-buy" onclick="execTrade('buy')">买入</button>
+<button class="btn-sell" onclick="execTrade('sell')">卖出</button>
+</div>
+<div id="tradeMsg" style="margin-top:8px;font-size:0.85rem;min-height:20px"></div>
+</div>
+<div class="tip-card">
+<div class="t-title">📖 交易规则</div>
+<div class="t-text">买入后股票会存入你的"持仓"。卖出时需要有足够数量的持仓。每完成一笔交易，建议点击下方"推进一日"观察价格变化。</div>
+</div>
+<button class="btn-primary" style="width:100%" onclick="nextDay()">⏩ 推进一个交易日</button>
+</div>
+
+<!-- ====== TAB 3: PORTFOLIO ====== -->
+<div class="tab-page" id="page-portfolio">
+<div class="stat-grid" id="pfStats"></div>
+<div class="card">
+<div class="card-title">📦 我的持仓</div>
+<div id="holdingsList"><p style="color:#b2bec3;font-size:0.85rem;text-align:center;padding:20px 0">还没有持仓哦～去"行情"页面买入股票吧 🎯</p></div>
+</div>
+<div class="card">
+<div class="card-title">📈 净值走势</div>
+<div id="navChart" class="chart-box"></div>
+</div>
+<div class="card">
+<div class="card-title">📊 资产配置</div>
+<div id="allocChart" class="chart-box"></div>
+</div>
+</div>
+
+<!-- ====== TAB 4: TOOLS ====== -->
+<div class="tab-page" id="page-tools">
+<div class="tip-card">
+<div class="t-title">🧰 金融工具箱</div>
+<div class="t-text">以下工具可以帮助你做投资决策。DCF估值可以算一家公司的股票值多少钱；复利计算器可以帮你规划长期投资。</div>
+</div>
+<div class="card">
+<div class="card-title">📈 DCF 估值模型 <span class="tip">算股票值不值</span></div>
+<div class="tool-grid">
+<div>
+<label>年自由现金流(万元)</label><input class="tool-input" type="number" id="dcf_fcf" value="1000">
+<label>增长率(%)</label><input class="tool-input" type="number" id="dcf_g" value="8">
+<label>折现率(%)</label><input class="tool-input" type="number" id="dcf_r" value="10">
+</div>
+<div>
+<label>预测期(年)</label><input class="tool-input" type="number" id="dcf_y" value="5">
+<label>永续增长率(%)</label><input class="tool-input" type="number" id="dcf_t" value="3">
+<label>总股本(万股)</label><input class="tool-input" type="number" id="dcf_s" value="100">
+</div>
+</div>
+<button class="btn-primary" onclick="calcDCF()">计算内在价值</button>
+<div id="dcfResult" style="margin-top:10px"></div>
+<div id="dcfChartBox" class="chart-box" style="margin-top:10px"></div>
+</div>
+<div class="card">
+<div class="card-title">🧮 复利定投计算器 <span class="tip">看看长期投资效果</span></div>
+<div class="tool-grid">
+<div>
+<label>初始本金(元)</label><input class="tool-input" type="number" id="cp_p" value="100000">
+<label>每月定投(元)</label><input class="tool-input" type="number" id="cp_m" value="5000">
+</div>
+<div>
+<label>年化收益率(%)</label><input class="tool-input" type="number" id="cp_r" value="10">
+<label>投资年限</label><input class="tool-input" type="number" id="cp_y" value="10">
+</div>
+</div>
+<button class="btn-primary" onclick="calcCompound()">计算</button>
+<div id="cpResult" style="margin-top:10px"></div>
+<div id="cpChartBox" class="chart-box" style="margin-top:10px"></div>
+</div>
+</div>
+
+<!-- ====== TAB 5: PROFILE ====== -->
+<div class="tab-page" id="page-profile">
+<div class="card profile-card">
+<div class="avatar">👩‍💼</div>
+<h3>严嘉琪</h3>
+<p>模拟投资账户</p>
+<div class="profile-stats">
+<div class="profile-stat"><div class="ps-val" id="pfDay">第 1 日</div><div class="ps-label">交易天数</div></div>
+<div class="profile-stat"><div class="ps-val" id="pfTrades">0</div><div class="ps-label">交易次数</div></div>
+<div class="profile-stat"><div class="ps-val" id="pfWinRate">-</div><div class="ps-label">胜率</div></div>
+<div class="profile-stat"><div class="ps-val" id="pfLevel">入门</div><div class="ps-label">投资等级</div></div>
+</div>
+</div>
+<div class="tip-card">
+<div class="t-title">📚 学习路径</div>
+<div class="t-text">
+<strong>阶段一：</strong>熟悉行情页面，观察几天价格波动<br>
+<strong>阶段二：</strong>小仓位试水，记录交易逻辑<br>
+<strong>阶段三：</strong>用 DCF 估值工具分析目标股票<br>
+<strong>阶段四：</strong>建立投资组合，管理风险
+</div>
+</div>
+<div class="card">
+<div class="card-title">📝 交易记录</div>
+<div id="journalList"><p style="color:#b2bec3;font-size:0.85rem;text-align:center;padding:12px 0">暂无记录</p></div>
+</div>
+<button class="btn-primary" style="width:100%;background:#d63031" onclick="resetAll()">🔄 重置所有数据</button>
+</div>
+
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+<button class="nav-item active" data-tab="home"><span class="icon">🏠</span><span class="label">首页</span></button>
+<button class="nav-item" data-tab="market"><span class="icon">📊</span><span class="label">行情</span></button>
+<button class="nav-item" data-tab="portfolio"><span class="icon">💼</span><span class="label">组合</span></button>
+<button class="nav-item" data-tab="tools"><span class="icon">🔧</span><span class="label">工具</span></button>
+<button class="nav-item" data-tab="profile"><span class="icon">👤</span><span class="label">我的</span></button>
+</div>
+
+<script>
+// ====== Data ======
+const INDICES = [
+{name:'上证指数',val:3350.28,chg:0.62},{name:'深证成指',val:11200.45,chg:-0.18},{name:'创业板指',val:2280.63,chg:1.25},{name:'科创50',val:980.15,chg:-0.45}
+];
+function updateIndices(){INDICES.forEach(i=>{i.val=Math.round((i.val+(Math.random()-0.48)*15)*100)/100;i.chg=Math.round(((i.val-3300)/33+Math.random()*0.2)*100)/100;});}
+
+const STOCKS = [
+{code:'600519',name:'贵州茅台',price:1532.00,base:1532,sec:'消费',pe:28.5},
+{code:'000001',name:'平安银行',price:12.35,base:12.35,sec:'银行',pe:5.2},
+{code:'300750',name:'宁德时代',price:218.50,base:218.5,sec:'新能源',pe:22.3},
+{code:'601318',name:'中国平安',price:42.80,base:42.8,sec:'保险',pe:8.1},
+{code:'600036',name:'招商银行',price:34.20,base:34.2,sec:'银行',pe:6.3},
+{code:'002594',name:'比亚迪',price:268.00,base:268,sec:'新能源',pe:35.2},
+{code:'000858',name:'五粮液',price:142.60,base:142.6,sec:'消费',pe:18.7},
+{code:'688981',name:'中芯国际',price:56.40,base:56.4,sec:'半导体',pe:45.1}
+];
+const SECTORS = ['消费','银行','新能源','保险','半导体'];
+const TIPS = [
+'不要把鸡蛋放在同一个篮子里——分散投资降低风险 🛡️',
+'长期持有优质公司比频繁交易更容易赚钱 📈',
+'投资前先用DCF估值算算股票值多少钱 🧮',
+'市场短期是投票机，长期是称重机 ⚖️',
+'不要追涨杀跌——这是大多数人亏钱的原因 🚫',
+'预留30%现金，等待好机会出现 💰',
+'了解一家公司的商业模式再投资，不要只看K线 🏢'
+];
+
+// ====== State ======
+let day = parseInt(localStorage.getItem('fg_day')) || 1;
+let cash = parseFloat(localStorage.getItem('fg_cash')) || 100000;
+let holdings = JSON.parse(localStorage.getItem('fg_holdings')) || {};
+let navHist = JSON.parse(localStorage.getItem('fg_nav')) || [100000];
+let journal = JSON.parse(localStorage.getItem('fg_journal')) || [];
+
+// ====== Init ======
+STOCKS.forEach(s => { s.base = s.base || s.price; });
+
+function getStockVal() {
+return Object.values(holdings).reduce((s,h) => s + h.qty * h.currentPrice, 0);
+}
+function getTotalAssets() { return cash + getStockVal(); }
+
+function save() {
+localStorage.setItem('fg_day',day);
+localStorage.setItem('fg_cash',cash);
+localStorage.setItem('fg_holdings',JSON.stringify(holdings));
+localStorage.setItem('fg_nav',JSON.stringify(navHist));
+localStorage.setItem('fg_journal',JSON.stringify(journal));
+}
+
+// ====== Tab Switching ======
+document.querySelectorAll('.nav-item').forEach(b => {
+b.addEventListener('click',function(){
+document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+this.classList.add('active');
+document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+document.getElementById('page-'+this.dataset.tab).classList.add('active');
+renderAll();
+});
+});
+
+// ====== Market Update ======
+function nextDay(){updateIndices();day++;STOCKS.forEach(s => {
+const trend = Math.sin(day*0.08)*0.002 + (Math.random()-0.48)*0.028;
+s.price = Math.round(s.price*(1+trend)*100)/100;
+});
+Object.keys(holdings).forEach(code => {
+const s = STOCKS.find(x=>x.code===code);
+if(s) holdings[code].currentPrice = s.price;
+});
+navHist.push(Math.round(getTotalAssets()));
+if(navHist.length > 120) navHist.shift();
+save();
+renderAll();
+document.getElementById('tradeDay').textContent = day;
+document.querySelector('[data-tab="market"]').click();
+showTradeMsg(`⏩ 已推进至第 ${day} 个交易日`, '#0984e3');
+}
+
+// ====== Trade ======
+function execTrade(dir) {
+const code = localStorage.getItem('fg_selStock');
+if(!code) { showTradeMsg('请先点击选择一只股票','#d63031'); return; }
+const s = STOCKS.find(x=>x.code===code);
+const qty = parseInt(document.getElementById('tradeQty').value);
+const price = parseFloat(document.getElementById('tradePrice').value) || s.price;
+if(!qty||qty<=0){showTradeMsg('请输入有效数量','#d63031');return;}
+const cost = qty * price;
+if(dir==='buy'){
+if(cost>cash){showTradeMsg('❌ 资金不足，可用 ¥'+cash.toFixed(2),'#d63031');return;}
+cash -= cost;
+if(!holdings[code]) holdings[code]={name:s.name,qty:0,avgCost:0,currentPrice:price};
+const h=holdings[code];
+h.avgCost = (h.avgCost*h.qty+cost)/(h.qty+qty);
+h.qty+=qty; h.currentPrice=price;
+journal.unshift({type:'buy',name:s.name,code,qty,price,day,time:new Date().toLocaleString()});
+showTradeMsg(`✅ 买入 ${s.name} ${qty}股 成交价¥${price.toFixed(2)}`,'#00b894');
+} else {
+if(!holdings[code]||holdings[code].qty<qty){showTradeMsg('❌ 持仓不足','#d63031');return;}
+const h=holdings[code];
+const pnl = (price - h.avgCost) * qty;
+cash += cost;
+h.qty -= qty; h.currentPrice=price;
+if(h.qty<=0) delete holdings[code];
+journal.unshift({type:'sell',name:s.name,code,qty,price,day,pnl,time:new Date().toLocaleString()});
+showTradeMsg(`✅ 卖出 ${s.name} ${qty}股 盈亏${pnl>=0?'+':''}¥${pnl.toFixed(2)}`,'#00b894');
+}
+navHist.push(Math.round(getTotalAssets()));
+save();
+renderAll();
+}
+
+function showTradeMsg(msg,color){
+const el=document.getElementById('tradeMsg');
+el.textContent=msg;el.style.color=color||'#2d3436';
+}
+
+// ====== Select Stock ======
+function selectStock(code) {
+localStorage.setItem('fg_selStock',code);
+const s=STOCKS.find(x=>x.code===code);
+document.getElementById('selStock').textContent=`${s.name} ¥${s.price.toFixed(2)}`;
+document.getElementById('tradePrice').value=s.price.toFixed(2);
+}
+
+// ====== DCF ======
+function calcDCF(){
+const fcf=parseFloat(document.getElementById('dcf_fcf').value)*10000;
+const g=parseFloat(document.getElementById('dcf_g').value)/100;
+const r=parseFloat(document.getElementById('dcf_r').value)/100;
+const y=parseInt(document.getElementById('dcf_y').value);
+const tg=parseFloat(document.getElementById('dcf_t').value)/100;
+const shares=parseFloat(document.getElementById('dcf_s').value)*10000;
+let pv=0,cf=fcf;
+for(let i=1;i<=y;i++){cf*=(1+g);pv+=cf/Math.pow(1+r,i);}
+const tv=cf*(1+tg)/(r-tg);
+const ev=pv+tv/Math.pow(1+r,y);
+const ps=ev/shares;
+document.getElementById('dcfResult').innerHTML=`
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px">
+<div><div class="result-label">企业价值</div><div class="result-val" style="font-size:1.1rem">¥${(ev/10000).toFixed(0)}万</div></div>
+<div><div class="result-label">每股价值</div><div class="result-val" style="font-size:1.3rem;color:#00b894">¥${ps.toFixed(2)}</div></div>
+<div><div class="result-label">终值占比</div><div class="result-val" style="font-size:1.1rem">${(tv/ev*100).toFixed(0)}%</div></div>
+</div>`;
+const chart=echarts.init(document.getElementById('dcfChartBox'));
+const d=[];
+for(let i=0;i<=y;i++) d.push(Math.round(fcf*Math.pow(1+g,i)/10000));
+chart.setOption({
+backgroundColor:'transparent',grid:{left:'3%',right:'3%',bottom:'3%',top:'3%',containLabel:true},
+xAxis:{type:'category',data:Array.from({length:y+1},(_,i)=>`第${i}年`),axisLabel:{fontSize:10}},
+yAxis:{type:'value',splitLine:{lineStyle:{color:'#eee'}}},
+series:[{type:'bar',data:d,itemStyle:{color:'#0984e3'},barMaxWidth:30}]
+},true);
+}
+
+// ====== Compound ======
+function calcCompound(){
+const p=parseFloat(document.getElementById('cp_p').value);
+const m=parseFloat(document.getElementById('cp_m').value);
+const r=parseFloat(document.getElementById('cp_r').value)/100/12;
+const y=parseInt(document.getElementById('cp_y').value);
+const months=y*12;
+let total=p,inv=p+m*months;
+const data=[total];
+for(let i=0;i<months;i++){total=total*(1+r)+m;data.push(Math.round(total));}
+document.getElementById('cpResult').innerHTML=`
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<div><div class="result-label">期末总资产</div><div class="result-val" style="color:#00b894">¥${Math.round(total).toLocaleString()}</div></div>
+<div><div class="result-label">总投入</div><div class="result-val">¥${inv.toLocaleString()}</div></div>
+<div><div class="result-label">总收益</div><div class="result-val" style="color:#0984e3">¥${Math.round(total-inv).toLocaleString()}</div></div>
+</div>`;
+const chart=echarts.init(document.getElementById('cpChartBox'));
+const step=Math.max(1,Math.floor(months/8));
+chart.setOption({
+backgroundColor:'transparent',grid:{left:'3%',right:'3%',bottom:'3%',top:'3%',containLabel:true},
+xAxis:{type:'category',data:data.filter((_,i)=>i%step===0).map((_,i)=>`第${i*step/12|0}年`),axisLabel:{fontSize:10}},
+yAxis:{type:'value',splitLine:{lineStyle:{color:'#eee'}}},
+series:[{type:'line',smooth:true,showSymbol:false,lineStyle:{width:2,color:'#00b894'},
+areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(0,184,148,0.2)'},{offset:1,color:'rgba(0,184,148,0)'}]}},
+data:data.filter((_,i)=>i%step===0)}]
+},true);
+}
+
+// ====== Reset ======
+function resetAll(){
+if(!confirm('确定重置所有数据？')) return;
+localStorage.removeItem('fg_day');localStorage.removeItem('fg_cash');
+localStorage.removeItem('fg_holdings');localStorage.removeItem('fg_nav');
+localStorage.removeItem('fg_journal');localStorage.removeItem('fg_selStock');
+location.reload();
+}
+
+// ====== Render All ======
+function renderAll(){
+const sv=getStockVal(),ta=getTotalAssets();
+const tc=Object.values(holdings).reduce((s,h)=>s+h.qty*h.avgCost,0);
+const pnl=sv-tc,ret=tc>0?pnl/tc*100:0;
+
+// Home stats
+document.getElementById('hTotal').textContent='¥'+ta.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+document.getElementById('hCash').textContent='¥'+cash.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const pe=document.getElementById('hPnl');pe.textContent=(pnl>=0?'+':'')+'¥'+pnl.toFixed(0);
+pe.className='s-val '+(pnl>=0?'up':'down');
+document.getElementById('hReturn').textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';
+document.getElementById('hReturn').className='s-val '+(ret>=0?'up':'down');
+
+// Market ticker
+document.getElementById('marketTicker').innerHTML=INDICES.map(i=>
+`<div class="market-item"><div class="name">${i.name}</div><div class="val ${i.chg>=0?'up':'down'}">${i.val.toFixed(2)}</div><div class="chg ${i.chg>=0?'up':'down'}">${(i.chg>=0?'+':'')+i.chg.toFixed(2)}%</div></div>`
+).join('');
+
+// Sectors
+document.getElementById('sectorList').innerHTML=SECTORS.map((s,idx)=>{
+const chg=Math.sin(day*0.2+idx)*2;
+return `<div class="stock-row" style="cursor:default">
+<span><span class="sector-tag">${s}</span><span style="font-size:0.8rem;color:#636e72">${['银行','保险'].includes(s)?'防御型':['新能源','半导体'].includes(s)?'成长型':'价值型'}</span></span>
+<span class="${chg>=0?'up':'down'}" style="font-weight:600">${chg>=0?'+':''}${chg.toFixed(2)}%</span>
+</div>`;
+}).join('');
+
+// Tips
+const startIdx=(day*3)%TIPS.length;
+document.getElementById('tipsList').innerHTML=TIPS.slice(startIdx, startIdx+3).map(t=>
+`<div class="tip-card" style="margin-bottom:8px"><div class="t-text">${t}</div></div>`
+).join('');
+
+// Stock list
+document.getElementById('stockList').innerHTML=STOCKS.map((s,idx)=>{
+const chg=s.price-s.base,pc=chg/s.base*100;
+return `<div class="stock-row" onclick="selectStock('${s.code}')">
+<div><div class="s-name">${s.name}</div><div class="s-code">${s.code} · PE ${s.pe}</div></div>
+<div><div class="s-price ${pc>=0?'up':'down'}">¥${s.price.toFixed(2)}</div><div class="s-chg ${pc>=0?'up':'down'}">${pc>=0?'+':''}${pc.toFixed(2)}%</div></div>
+</div>`;
+}).join('');
+
+// Portfolio stats
+document.getElementById('pfStats').innerHTML=`
+<div class="stat-box"><div class="s-label">总资产</div><div class="s-val">¥${ta.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</div></div>
+<div class="stat-box"><div class="s-label">持仓市值</div><div class="s-val">¥${sv.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</div></div>
+<div class="stat-box"><div class="s-label">可用资金</div><div class="s-val">¥${cash.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</div></div>
+<div class="stat-box"><div class="s-label">持仓数</div><div class="s-val">${Object.keys(holdings).length}</div></div>
+`;
+
+// Holdings
+const hArr=Object.entries(holdings);
+if(hArr.length===0){
+document.getElementById('holdingsList').innerHTML='<p style="color:#b2bec3;font-size:0.85rem;text-align:center;padding:20px 0">还没有持仓哦～去"行情"页面买入股票吧 🎯</p>';
+} else {
+document.getElementById('holdingsList').innerHTML=hArr.map(([code,h])=>{
+const mv=h.qty*h.currentPrice,cp=h.qty*h.avgCost,pp=mv-cp,pr=cp>0?pp/cp*100:0;
+return `<div class="hold-item">
+<div class="hold-left"><div class="h-name">${h.name}</div><div class="h-detail">${h.qty}股 · 成本¥${h.avgCost.toFixed(2)}</div></div>
+<div class="hold-right"><div class="h-val">¥${mv.toFixed(0)}</div><div class="h-pnl ${pp>=0?'up':'down'}">${pp>=0?'+':''}${pr.toFixed(1)}%</div></div>
+</div>`;
+}).join('');
+}
+
+// NAV Chart
+const nc=echarts.init(document.getElementById('navChart'));
+nc.setOption({
+backgroundColor:'transparent',grid:{left:'3%',right:'3%',bottom:'3%',top:'3%',containLabel:true},
+xAxis:{type:'category',data:navHist.map((_,i)=>i+1),axisLabel:{color:'#b2bec3',fontSize:9},axisLine:{lineStyle:{color:'#eee'}}},
+yAxis:{type:'value',splitLine:{lineStyle:{color:'#f5f6fa'}},axisLabel:{color:'#b2bec3',fontSize:9}},
+series:[{type:'line',smooth:true,showSymbol:false,lineStyle:{width:2,color:'#0984e3'},
+areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(9,132,227,0.15)'},{offset:1,color:'rgba(9,132,227,0)'}]}},
+data:navHist}]
+},true);
+
+// Allocation
+const ac=echarts.init(document.getElementById('allocChart'));
+let ad=[{name:'现金',value:Math.round(cash)}];
+hArr.forEach(([code,h])=>ad.push({name:h.name,value:Math.round(h.qty*h.currentPrice)}));
+if(ad.length===1) ad=[{name:'现金',value:1}];
+ac.setOption({
+backgroundColor:'transparent',tooltip:{trigger:'item',formatter:'{b}: {c}'},
+series:[{type:'pie',radius:['30%','60%'],center:['50%','50%'],
+label:{color:'#636e72',fontSize:10},labelLine:{lineStyle:{color:'#dfe6e9'}},
+data:ad,color:['#00b894','#0984e3','#fdcb6e','#d63031','#6c5ce7','#e17055','#00cec9']}]
+},true);
+
+// Profile
+document.getElementById('pfDay').textContent=`第 ${day} 日`;
+const trades=journal.length;
+document.getElementById('pfTrades').textContent=trades;
+const wins=journal.filter(j=>j.type==='sell'&&j.pnl>0).length;
+document.getElementById('pfWinRate').textContent=trades>0?`${(wins/trades*100).toFixed(0)}%`:'-';
+document.getElementById('pfLevel').textContent=trades<3?'入门':trades<10?'进阶':'熟手';
+
+// Journal
+if(journal.length===0){
+document.getElementById('journalList').innerHTML='<p style="color:#b2bec3;font-size:0.85rem;text-align:center;padding:12px 0">暂无交易记录</p>';
+} else {
+document.getElementById('journalList').innerHTML=journal.slice(0,10).map(j=>
+`<div class="hold-item" style="padding:8px 0">
+<div><span style="font-weight:600;font-size:0.85rem">${j.name}</span><br><span style="font-size:0.7rem;color:#b2bec3">第${j.day}日 ${j.type==='buy'?'买入':'卖出'} ${j.qty}股</span></div>
+<div style="text-align:right;font-size:0.85rem"><span style="color:${j.type==='buy'?'#00b894':'#d63031'}">${j.type==='buy'?'-':'+'}¥${(j.qty*j.price).toFixed(0)}</span></div>
+</div>`
+).join('');
+}
+
+document.getElementById('tradeDay').textContent=day;
+}
+
+// ====== Init ======
+renderAll();
+</script>
+</body>
+</html>
+
+
