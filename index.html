@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>严嘉琪 | 金融 · 投资 · 数据分析</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.8;color:#2d3436;background:#fff}
+.container{max-width:960px;margin:0 auto;padding:0 24px}
+nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(255,255,255,0.95);border-bottom:1px solid #eee}
+nav .container{display:flex;justify-content:space-between;align-items:center;height:60px}
+nav .logo{font-weight:700}
+nav ul{list-style:none;display:flex;gap:24px}
+nav ul li a{color:#636e72;text-decoration:none;font-size:0.9rem}
+nav ul li a:hover{color:#e17055}
+.hero{min-height:100vh;display:flex;align-items:center;background:linear-gradient(160deg,#fff,#fdf6f3,#fef0ec);padding-top:60px}
+.hero .container{display:flex;align-items:center;gap:60px}
+.avatar{width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,#e17055,#fdcb6e);display:flex;align-items:center;justify-content:center;font-size:3.5rem;color:#fff}
+.hero h1{font-size:2.5rem;margin-bottom:8px}
+.tagline{font-size:1.1rem;color:#e17055;font-weight:600;margin-bottom:16px}
+.sub{color:#636e72;font-size:0.95rem;margin-bottom:24px;max-width:500px}
+.btn{display:inline-block;padding:12px 28px;border-radius:100px;font-weight:600;text-decoration:none;transition:all .2s}
+.btn-primary{background:#e17055;color:#fff}
+.btn-primary:hover{background:#d63031;transform:translateY(-2px)}
+.btn-outline{color:#636e72;border:1.5px solid #dfe6e9;margin-left:12px}
+.btn-outline:hover{border-color:#e17055;color:#e17055}
+section{padding:80px 0}
+section.alt{background:#f8f9fa}
+h2{font-size:1.5rem;margin-bottom:32px;color:#2d3436}
+h2::after{content:"";display:block;width:36px;height:3px;background:#e17055;margin-top:8px;border-radius:2px}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.about-text p{color:#636e72;margin-bottom:12px}
+.card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:24px;margin-bottom:16px}
+.card h4{font-size:0.95rem;margin-bottom:8px}
+.card ul{list-style:none}
+.card ul li{padding:6px 0;color:#636e72;font-size:0.9rem;border-bottom:1px solid #f5f5f5}
+.card ul li:last-child{border-bottom:none}
+.gpa{color:#e17055;font-weight:700}
+.skills-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.skill{border:1px solid #f0f0f0;border-radius:12px;padding:20px 12px;text-align:center;background:#fff}
+.skill .s-icon{font-size:1.4rem;display:block;margin-bottom:6px}
+.skill .s-name{font-weight:600;font-size:0.85rem}
+.project-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:28px;margin-bottom:16px}
+.project-card h3{font-size:1.1rem;margin-bottom:4px}
+.project-card .meta{font-size:0.8rem;color:#b2bec3;margin-bottom:8px}
+.project-card p{color:#636e72;font-size:0.9rem}
+.contact{text-align:center}
+.contact p{color:#636e72;margin-bottom:20px}
+.contact a{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:100px;border:1.5px solid #dfe6e9;text-decoration:none;color:#636e72;font-weight:600}
+.contact a:hover{border-color:#e17055;color:#e17055}
+footer{text-align:center;padding:32px 0;border-top:1px solid #f0f0f0;color:#b2bec3;font-size:0.8rem}
+.tag{display:inline-block;padding:2px 10px;border-radius:100px;font-size:0.75rem;background:#fef0ec;color:#e17055;margin:2px 4px 2px 0}
+@media(max-width:768px){
+.hero .container{flex-direction:column;text-align:center;gap:24px}
+.hero h1{font-size:2rem}
+.about-grid{grid-template-columns:1fr}
+.skills-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav>
+<div class="container">
+<div class="logo">严嘉琪</div>
+<ul>
+<li><a href="#about">关于</a></li>
+<li><a href="#skills">技能</a></li>
+<li><a href="#projects">项目</a></li>
+<li><a href="#contact">联系</a></li>
+</ul>
+</div>
+</nav>
+
+<section class="hero">
+<div class="container">
+<div class="avatar">👩</div>
+<div>
+<h1>严嘉琪</h1>
+<p class="tagline">金融 · 投资 · 数据分析</p>
+<p class="sub">深圳大学 · 金融科技 · 大三<br>GPA 3.67/4.5 · 专业前 25%<br>公司金融 A+ · 金融学 A+ · 微观/宏观经济学 A+ · 投资管理 100 分</p>
+<a href="#projects" class="btn btn-primary">查看项目</a>
+<a href="#about" class="btn btn-outline">关于我</a>
+</div>
+</div>
+</section>
+
+<section id="about">
+<div class="container">
+<h2>关于我</h2>
+<div class="about-grid">
+<div class="about-text">
+<p>我是严嘉琪，深圳大学金融科技专业，即将大三。<span class="gpa">GPA 3.67/4.5</span>，专业前 25%。</p>
+<p>金融是我最核心的优势方向——公司金融 A+、金融学 A+、微观经济学 A+、宏观经济学 A+，投资管理  A+。同时也在系统学习 Python、R、SQL 等技术工具。</p>
+<p style="margin-top:12px;font-weight:600;">📌 寻找 2026 暑期金融科技/数据分析实习</p>
+</div>
+<div>
+<div class="card">
+<h4>🎓 教育</h4>
+<ul>
+<li>深圳大学 · 金融科技学院 · 2024-至今</li>
+<li>GPA 3.66/4.5 · 专业前 25%</li>
+<li>公司金融 A+ · 金融学 A+ · 微观经济学 A+</li>
+<li>宏观经济学 A+ · 管理学原理 A</li>
+<li>投资管理 100 分 · 英语 CET-6</li>
+</ul>
+</div>
+<div class="card">
+<h4>🌟 校园经历</h4>
+<ul>
+<li>志愿者联合会宣传部部长 · 公众号 30+ 篇</li>
+<li>鲜花义卖组织者 · 筹款 4.5 万元 · 售花 6000+ 枝</li>
+<li>管理学调研报告获评"优秀报告"</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="skills" class="alt">
+<div class="container">
+<h2>技能</h2>
+<div class="skills-grid">
+<div class="skill"><span class="s-icon">🏦</span><div class="s-name">金融分析</div></div>
+<div class="skill"><span class="s-icon">🐍</span><div class="s-name">Python</div></div>
+<div class="skill"><span class="s-icon">📊</span><div class="s-name">R / ggplot2</div></div>
+<div class="skill"><span class="s-icon">🗃️</span><div class="s-name">SQL</div></div>
+<div class="skill"><span class="s-icon">📈</span><div class="s-name">Excel</div></div>
+<div class="skill"><span class="s-icon">📉</span><div class="s-name">数据分析</div></div>
+<div class="skill"><span class="s-icon">💻</span><div class="s-name">C++ 基础</div></div>
+<div class="skill"><span class="s-icon">🔍</span><div class="s-name">iFinD · 巨潮</div></div>
+</div>
+</div>
+</section>
+
+<section id="projects">
+<div class="container">
+<h2>项目经历</h2>
+
+<div class="project-card">
+<span class="tag">🌟 独立完成</span><span class="tag">数据分析</span>
+<h3>银行客户精准营销分析</h3>
+<p class="meta">2026 暑期 · 商业分析训练营</p>
+<p>基于银行客户数据集完成完整的数据分析 Pipeline，对客户多维度进行探索性分析，识别高价值客户群体特征，输出精准营销策略建议。</p>
+</div>
+
+<div class="project-card">
+<span class="tag">👥 小组项目</span><span class="tag">金融分析</span>
+<h3>北交所上市公司投资价值研究</h3>
+<p class="meta">2026 暑期 · 数据分析角色</p>
+<p>从财务指标、行业地位、成长性、估值水平等维度构建评估框架，对多家北交所上市公司进行横向对比分析。</p>
+</div>
+
+<div class="project-card">
+<span class="tag">📊 R 数据分析</span>
+<h3>大学生 GPA 影响因素数据分析</h3>
+<p class="meta">2026.07</p>
+<p>使用 R 语言对美国大学生 GPA 数据集进行递进式探索性分析。通过箱线图、分组对比等方法分析 SAT 分数、性别等因素与 GPA 的关系。</p>
+</div>
+
+<div class="project-card">
+<span class="tag">📋 行业分析</span>
+<h3>小米公司研究分析</h3>
+<p class="meta">行业分析员 · 2025.04 - 2025.05</p>
+<p>翻看招股说明书 300+ 页，分析商业模式与收入成本结构。建立渗透率模型估算智能硬件市场规模，从盈利、偿债、营运、成长四角度进行财务分析。</p>
+</div>
+
+<div class="project-card">
+<span class="tag">📝 优秀报告</span>
+<h3>管理学原理 · 企业管理深度调研</h3>
+<p class="meta">核心策划采访者 · 2025.04 - 2025.05</p>
+<p>主导完成针对企业管理者的深度调研，设计结构化采访问题，高效提炼关键数据支撑 10 页调研报告，获评优秀报告。</p>
+</div>
+</div>
+</section>
+
+<section id="contact" class="alt">
+<div class="container">
+<h2>联系我</h2>
+<div class="contact">
+<p>如果你有实习机会、项目合作，或者想聊聊金融和数据——欢迎找我 🍜</p>
+<a href="https://github.com/Jessica17777" target="_blank">GitHub · Jessica17777</a>
+</div>
+</div>
+</section>
+
+<footer>
+<p>© 2026 严嘉琪</p>
+</footer>
+</body>
+</html>
