@@ -5,7 +5,7 @@
 - [ ✔] About：真实个人简介 + 教育 + 校园经历
 - [ ✔] Skills：8 项技能卡片
 - [ ✔] Projects：5 个真实项目
-- [ ]✔ Contact：GitHub @Jessica17777
+- [ ✔] Contact：GitHub @Jessica17777
 
 ## 功能验收
 - [ ✔] GitHub Pages 可访问
